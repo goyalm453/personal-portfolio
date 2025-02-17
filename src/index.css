@@ -5,13 +5,14 @@
 /* Enable smooth scrolling for the entire page */
 html {
   scroll-behavior: smooth;
-  overflow-y: auto; /* Ensure smooth scrolling on mobile */
+  touch-action: manipulation; /* Improve touch handling */
+  -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
 }
 
 body {
   background-color: black;
   color: white;
-  overflow-y: auto; /* Ensure smooth scrolling on mobile */
+  overscroll-behavior-y: none; /* Prevent overscroll bounce */
 }
 
 
