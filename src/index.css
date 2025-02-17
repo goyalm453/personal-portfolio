@@ -2,19 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Enable smooth scrolling for the entire page */
+/* Enable smooth scrolling and touch handling */
 html {
   scroll-behavior: smooth;
-  touch-action: manipulation; /* Improve touch handling */
+  touch-action: pan-y pinch-zoom; /* Enable vertical scrolling and pinch zoom */
   -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
+  height: 100%;
+  width: 100%;
 }
 
 body {
   background-color: black;
   color: white;
-  overscroll-behavior-y: none; /* Prevent overscroll bounce */
+  overscroll-behavior: none; /* Prevent overscroll bounce */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  width: 100%;
+  height: 100%;
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
 }
-
 
 /* Hide scrollbar for the testimonials section */
 @keyframes scroll {
@@ -28,6 +38,7 @@ body {
 
 .infinite-scroll-container {
   animation: scroll 30s linear infinite;
+  touch-action: pan-x; /* Enable horizontal touch scrolling */
 }
 
 .infinite-scroll-container:hover {
@@ -51,6 +62,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #0891b2;
 }
+
 .grid-pattern {
   background-size: 50px 50px;
   background-image: 
@@ -81,6 +93,7 @@ body {
     background-position: 50px 50px;
   }
 }
+
 @keyframes gradient {
   0% {
     background-position: 0% 50%;
@@ -109,6 +122,7 @@ body {
   padding-bottom: 4px;
   line-height: 1.2;
 }
+
 @keyframes border-follow {
   0% {
     left: 0;
@@ -166,6 +180,7 @@ body {
     border-color: #3b82f6; 
   }
 }
+
 .stars {
   background-image: 
     radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
@@ -185,6 +200,7 @@ body {
   50% { opacity: 0.8; }
   100% { opacity: 0.5; }
 }
+
 /* About Image Glow Effect */
 .about-image-container {
   position: relative;
@@ -226,6 +242,7 @@ body {
   transform: rotate(45deg) translate(450%, 0);
   transition: all 1s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
+
 @keyframes scroll {
   0% {
     transform: translateX(0);
@@ -243,6 +260,7 @@ body {
 .tape-scroll-container:hover {
   animation-play-state: paused;
 }
+
 @keyframes waves {
   0% {
     transform: translateY(0);
@@ -260,6 +278,7 @@ body {
     opacity: 0;
   }
 }
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
