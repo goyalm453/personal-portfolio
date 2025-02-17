@@ -5,11 +5,13 @@
 /* Enable smooth scrolling for the entire page */
 html {
   scroll-behavior: smooth;
+  overflow-y: auto; /* Ensure smooth scrolling on mobile */
 }
 
 body {
   background-color: black;
   color: white;
+  overflow-y: auto; /* Ensure smooth scrolling on mobile */
 }
 
 
