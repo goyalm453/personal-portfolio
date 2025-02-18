@@ -304,52 +304,6 @@ function App() {
     );
   };
 
-  // Add touch event handlers for better mobile scrolling
-  useEffect(() => {
-    let touchStartY = 0;
-    let touchEndY = 0;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      touchEndY = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = () => {
-      const difference = touchStartY - touchEndY;
-      const threshold = 50; // Minimum swipe distance
-
-      if (Math.abs(difference) > threshold) {
-        // Determine scroll direction
-        if (difference > 0) {
-          // Scroll down
-          window.scrollBy({
-            top: window.innerHeight / 2,
-            behavior: 'smooth'
-          });
-        } else {
-          // Scroll up
-          window.scrollBy({
-            top: -window.innerHeight / 2,
-            behavior: 'smooth'
-          });
-        }
-      }
-    };
-
-    document.addEventListener('touchstart', handleTouchStart);
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-
-    return () => {
-      document.removeEventListener('touchstart', handleTouchStart);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-black text-white">
       <Preloader isLoading={isLoading} />
