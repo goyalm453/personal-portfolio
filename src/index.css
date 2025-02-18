@@ -274,12 +274,3 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.7);
 }
-@media (max-width: 768px) {
-  /* Core containment */
-  html, body {
-    overflow: hidden;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-}
-  
