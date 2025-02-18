@@ -277,45 +277,8 @@ body {
 @media (max-width: 768px) {
   /* Core containment */
   html, body {
-    overflow-x: hidden !important;
     width: 100% !important;
     max-width: 100% !important;
   }
-
-  /* Services section specific fix */
-  #services .grid {
-    grid-template-columns: 1fr;
-    margin: 0 5%;
-    width: 90%;
-  }
-
-  /* Project section adjustments */
-  #portfolio .grid {
-    padding: 0 5%;
-  }
-
-  /* Testimonial carousel containment */
-  .infinite-scroll-container {
-    width: 100vw !important;
-  }
-
-  /* Skill tape scroll fix */
-  .tape-scroll-container {
-    width: 100vw;
-    padding: 0 5%;
-  }
-
-  /* Grid pattern final fix */
-  .grid-pattern {
-    background-size: 30px 30px;
-    animation: pattern-move 12s linear infinite;
-    width: 100vw;
-  }
 }
-
-/* Force all images to be contained */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
+  
