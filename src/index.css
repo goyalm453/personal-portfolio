@@ -2,16 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Enable smooth scrolling for the entire page */
+/* Base styles for all screen sizes */
 html {
   scroll-behavior: smooth;
+  width: 100%;
 }
 
 body {
   background-color: black;
   color: white;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
 }
 
+#root {
+  width: 100%;
+}
 
 /* Hide scrollbar for the testimonials section */
 @keyframes scroll {
@@ -48,6 +57,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #0891b2;
 }
+
 .grid-pattern {
   background-size: 50px 50px;
   background-image: 
@@ -78,6 +88,7 @@ body {
     background-position: 50px 50px;
   }
 }
+
 @keyframes gradient {
   0% {
     background-position: 0% 50%;
@@ -106,6 +117,7 @@ body {
   padding-bottom: 4px;
   line-height: 1.2;
 }
+
 @keyframes border-follow {
   0% {
     left: 0;
@@ -163,6 +175,7 @@ body {
     border-color: #3b82f6; 
   }
 }
+
 .stars {
   background-image: 
     radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
@@ -182,11 +195,13 @@ body {
   50% { opacity: 0.8; }
   100% { opacity: 0.5; }
 }
+
 /* About Image Glow Effect */
 .about-image-container {
   position: relative;
   overflow: hidden;
   border-radius: 1rem;
+  max-width: 100%;
 }
 
 .about-image {
@@ -196,6 +211,8 @@ body {
   margin-top: -10px;
   border-radius: 1rem;
   will-change: filter;
+  max-width: 100%;
+  height: auto;
 }
 
 .about-image-container:hover .about-image {
@@ -223,6 +240,7 @@ body {
   transform: rotate(45deg) translate(450%, 0);
   transition: all 1s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
+
 @keyframes scroll {
   0% {
     transform: translateX(0);
@@ -240,6 +258,7 @@ body {
 .tape-scroll-container:hover {
   animation-play-state: paused;
 }
+
 @keyframes waves {
   0% {
     transform: translateY(0);
@@ -257,6 +276,7 @@ body {
     opacity: 0;
   }
 }
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -273,4 +293,52 @@ body {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.7);
+}
+
+/* Mobile-specific styles */
+@media screen and (max-width: 768px) {
+  html {
+    overflow-x: hidden;
+  }
+  
+  body {
+    overflow-x: hidden;
+    touch-action: pan-y pinch-zoom;
+  }
+  
+  #root {
+    overflow-x: hidden;
+  }
+  
+  * {
+    box-sizing: border-box;
+    max-width: 100vw;
+  }
+  
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .infinite-scroll-container {
+    width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* Desktop-specific styles */
+@media screen and (min-width: 769px) {
+  html, body, #root {
+    overflow-x: initial;
+    max-width: initial;
+  }
+  
+  * {
+    max-width: initial;
+  }
+  
+  .infinite-scroll-container {
+    width: auto;
+    overflow-x: initial;
+  }
 }
