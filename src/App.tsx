@@ -181,8 +181,8 @@ function App() {
       number: "02",
       title: "Luna  – AI-Powered Companion",
       description: "Luna  is an intelligent AI companion designed for engaging, human-like conversations. It offers personalized interactions, instant responses, and smart assistance, making it the perfect virtual companion for users seeking seamless AI-powered support. 🚀",
-      image: "pubic/Luna.png",
-      mockup: "/pubic/Luna.png",
+      image: "/Luna.png",
+      mockup: "/Luna.png",
       projectUrl: "https://lunaworld.netlify.app/"
     },
     {
