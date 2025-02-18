@@ -19,7 +19,7 @@ function App() {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [showResume, setShowResume] = useState(false);
   
-  const resumeUrl = "pubic/MohitGoyal.pdf";
+  const resumeUrl = "/MohitGoyal.pdf";
 
   // Update loading state based on window load event
   useEffect(() => {
@@ -37,7 +37,7 @@ function App() {
   }, []);
   
   const useCustomLogo = true;
-  const customLogoUrl = "pubic/logo1.png";
+  const customLogoUrl = "/logo1.png";
 
   const skills = [
     "Usability Testing",
@@ -139,27 +139,27 @@ function App() {
     {
       title: "UI/UX Design",
       description: "Crafting seamless and user-friendly experiences through intuitive and aesthetically pleasing interfaces.",
-      icon: "pubic/user research (2).png"
+      icon: "/uiux.png"
     },
     {
       title: "User Research",
       description: "Conducting in-depth analysis to understand user behavior, pain points, and preferences for data-driven design decisions.",
-      icon: "pubic/user research (1).png"
+      icon: "/user-research.png"
     },
     {
       title: "Wireframing & Prototyping",
       description: "Creating structured layouts and interactive prototypes to visualize and refine user journeys before development.",
-      icon: "pubic/prototype.png"
+      icon: "/prototype.png"
     },
     {
       title: "Mobile App Design",
       description: "Designing user interfaces optimized for mobile platforms, ensuring a responsive and engaging experience across devices.",
-      icon: "pubic/app-development.png"
+      icon: "/app-development.png"
     },
     {
       title: "Graphic Design",
       description: "I create appealing designs which effectively communicate your message that align with brand identity.",
-      icon: "pubic/graphic-design.png"
+      icon: "/graphic-design.png"
     },
     {
       title: "Website Design",
@@ -173,8 +173,8 @@ function App() {
       number: "01",
       title: "Resumer- AI-Powered Resume Builder",
       description: "Resumer is an Ai Powered Resume Builder toolkit that helps job seekers and Working Professionals to create ATS-friendly, professional resumes effortlessly. With AI-powered optimization, smart templates, real-time suggestions, and one-click customization, users can craft standout resumes in seconds. 🚀",
-      image: "public/Resumer.png",
-      mockup: "public/Resumer.png",
+      image: "/Resumer.png",
+      mockup: "/Resumer.png",
       projectUrl: "https://www.behance.net/gallery/205453139/Resumer-AI-Powered-Resume-Builder-Toolkit-Case-Study"
     },
     {
@@ -189,8 +189,8 @@ function App() {
       number: "03",
       title: "Redesign Of Monster Energy Website",
       description: "I redesigned the Monster Energy landing page to enhance user engagement and brand appeal. The new design features a bold, high-energy UI, improved navigation, and interactive elements, showcasing my prototyping skills in creating an immersive and dynamic user experience. 🚀",
-      image: "pubic/monster.png",
-      mockup: "pubic/monster.png",
+      image: "/monster.png",
+      mockup: "/monster.png",
       projectUrl: "https://www.behance.net/gallery/193970525/Redesign-The-Monster-Energy-Website"
     }
   ];
@@ -199,17 +199,17 @@ function App() {
     {
       text: "Working with Mohit was an excellent experience for my business. The attention to detail exceeded my expectations, and I couldn't be happier with the customer engagement. Highly recommended!",
       author: "Ashley Bekteshi",
-      avatar: "pubic/avatar-2.png"
+      avatar: "/avatar-2.png"
     },
     {
       text: "I was blown away by the creativity and professionalism brought to our project. The attention to detail exceeded expectations, and the end result was exactly what we needed. I can't wait to collaborate again!",
       author: "mark Butle",
-      avatar: "pubic/avatar-1.png"
+      avatar: "/avatar-1.png"
     },
     {
       text: "I needed a website with clean design and Mohit delivered magnificently. Their attention to detail exceeded my expectations. Very satisfied!                                    ",
       author: "Vijayendra Gopal",
-      avatar: "pubic/avatar-4.png"
+      avatar: "/avatar-4.png"
     }
   ];
 
@@ -239,22 +239,22 @@ function App() {
     
     {
       name: "Twitter",
-      image: "pubic/twitter.png",
+      image: "/twitter.png",
       url: "https://twitter.com/goyalm453"
     },
     {
       name: "Instagram",
-      image: "pubic/instagram.png",
+      image: "/instagram.png",
       url: "https://instagram.com/mohit_1218"
     },
     {
       name: "LinkedIn",
-      image: "pubic/linkdein.png",
+      image: "/linkdein.png",
       url: "https://www.linkedin.com/in/mohit-goyal-904982230/"
     },
     {
       name: "Behance",
-      image: "pubic/behance.png",
+      image: "/behance.png",
       url: "https://www.behance.net/mohitgoyal453"
     }
   ];
@@ -532,7 +532,7 @@ function App() {
                 }}
               >
                 <img 
-                  src="pubic/photo.jpg"
+                  src="/photo.jpg"
                   alt="Professional portrait"
                   className="about-image w-full h-[400px] md:h-[400px] object-cover"
                 />

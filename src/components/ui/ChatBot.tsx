@@ -16,8 +16,8 @@ interface ChatBotProps {
 }
 
 // Custom avatar URLs from Unsplash
-const AI_AVATAR_URL = "pubic/my-avatar.png";
-const USER_AVATAR_URL = "pubic/hippie_4526032.png";
+const AI_AVATAR_URL = "/my-avatar.png";
+const USER_AVATAR_URL = "/hippie_4526032.png";
 
 const WELCOME_MESSAGE = {
   type: 'bot' as const,
