@@ -274,13 +274,35 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.7);
 }
-/* Prevent horizontal overflow on mobile only */
+/* Add this to your global styles */
 @media (max-width: 767px) {
   html, body {
+    overflow-y: auto;
+    height: 100%;
+  }
+  
+  body {
+    position: relative;
+    width: 100vw;
     overflow-x: hidden;
   }
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+/* Scrollbar customization */
+@media (max-width: 767px) {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
