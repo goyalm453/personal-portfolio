@@ -174,7 +174,7 @@ function App() {
       title: "Resumer- AI-Powered Resume Builder",
       description: "Resumer is an Ai Powered Resume Builder toolkit that helps job seekers and Working Professionals to create ATS-friendly, professional resumes effortlessly. With AI-powered optimization, smart templates, real-time suggestions, and one-click customization, users can craft standout resumes in seconds. 🚀",
       image: "pubic/Resumer.png",
-      mockup: "pubic/Resumer.png",
+      mockup: "../Resumer.png",
       projectUrl: "https://www.behance.net/gallery/205453139/Resumer-AI-Powered-Resume-Builder-Toolkit-Case-Study"
     },
     {
@@ -209,7 +209,7 @@ function App() {
     {
       text: "I needed a website with clean design and Mohit delivered magnificently. Their attention to detail exceeded my expectations. Very satisfied!                                    ",
       author: "Vijayendra Gopal",
-      avatar: "pubic/avatar-4.png"
+      avatar: "../avatar-4.png"
     }
   ];
 
