@@ -139,27 +139,27 @@ function App() {
     {
       title: "UI/UX Design",
       description: "Crafting seamless and user-friendly experiences through intuitive and aesthetically pleasing interfaces.",
-      icon: "pubic/user research (2).png"
+      icon: "/user research (2).png"
     },
     {
       title: "User Research",
       description: "Conducting in-depth analysis to understand user behavior, pain points, and preferences for data-driven design decisions.",
-      icon: "pubic/user research (1).png"
+      icon: "/user research (1).png"
     },
     {
       title: "Wireframing & Prototyping",
       description: "Creating structured layouts and interactive prototypes to visualize and refine user journeys before development.",
-      icon: "pubic/prototype.png"
+      icon: "/prototype.png"
     },
     {
       title: "Mobile App Design",
       description: "Designing user interfaces optimized for mobile platforms, ensuring a responsive and engaging experience across devices.",
-      icon: "pubic/app-development.png"
+      icon: "/app-development.png"
     },
     {
       title: "Graphic Design",
       description: "I create appealing designs which effectively communicate your message that align with brand identity.",
-      icon: "pubic/graphic-design.png"
+      icon: "/graphic-design.png"
     },
     {
       title: "Website Design",
@@ -173,24 +173,24 @@ function App() {
       number: "01",
       title: "Resumer- AI-Powered Resume Builder",
       description: "Resumer is an Ai Powered Resume Builder toolkit that helps job seekers and Working Professionals to create ATS-friendly, professional resumes effortlessly. With AI-powered optimization, smart templates, real-time suggestions, and one-click customization, users can craft standout resumes in seconds. 🚀",
-      image: "pubic/Resumer.png",
-      mockup: "/project/Resumer.png",
+      image: "/Resumer.png",
+      mockup: "/Resumer.png",
       projectUrl: "https://www.behance.net/gallery/205453139/Resumer-AI-Powered-Resume-Builder-Toolkit-Case-Study"
     },
     {
       number: "02",
       title: "Luna  – AI-Powered Companion",
       description: "Luna  is an intelligent AI companion designed for engaging, human-like conversations. It offers personalized interactions, instant responses, and smart assistance, making it the perfect virtual companion for users seeking seamless AI-powered support. 🚀",
-      image: "pubic/Luna.png",
-      mockup: "/pubic/Luna.png",
+      image: "/Luna.png",
+      mockup: "/Luna.png",
       projectUrl: "https://lunaworld.netlify.app/"
     },
     {
       number: "03",
       title: "Redesign Of Monster Energy Website",
       description: "I redesigned the Monster Energy landing page to enhance user engagement and brand appeal. The new design features a bold, high-energy UI, improved navigation, and interactive elements, showcasing my prototyping skills in creating an immersive and dynamic user experience. 🚀",
-      image: "pubic/monster.png",
-      mockup: "pubic/monster.png",
+      image: "/monster.png",
+      mockup: "/monster.png",
       projectUrl: "https://www.behance.net/gallery/193970525/Redesign-The-Monster-Energy-Website"
     }
   ];
@@ -209,7 +209,7 @@ function App() {
     {
       text: "I needed a website with clean design and Mohit delivered magnificently. Their attention to detail exceeded my expectations. Very satisfied!                                    ",
       author: "Vijayendra Gopal",
-      avatar: "../avatar-4.png"
+      avatar: "pubic/avatar-4.png"
     }
   ];
 
