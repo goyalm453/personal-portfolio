@@ -189,8 +189,8 @@ function App() {
       number: "03",
       title: "Redesign Of Monster Energy Website",
       description: "I redesigned the Monster Energy landing page to enhance user engagement and brand appeal. The new design features a bold, high-energy UI, improved navigation, and interactive elements, showcasing my prototyping skills in creating an immersive and dynamic user experience. 🚀",
-      image: "/monster.png",
-      mockup: "/monster.png",
+      image: "/images/monster.png",
+      mockup: "/images/monster.png",
       projectUrl: "https://www.behance.net/gallery/193970525/Redesign-The-Monster-Energy-Website"
     }
   ];
