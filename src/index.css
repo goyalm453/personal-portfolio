@@ -277,6 +277,7 @@ body {
 @media (max-width: 768px) {
   /* Core containment */
   html, body {
+    overflow: hidden;
     width: 100% !important;
     max-width: 100% !important;
   }
