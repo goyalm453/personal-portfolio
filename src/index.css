@@ -274,24 +274,3 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.7);
 }
-/* Add this to your global styles */
-@media (max-width: 767px) {
-  html, body {
-    overflow-y: auto;
-    height: 100%;
-  }
-  
-  body {
-    position: relative;
-    width: 100vw;
-    overflow-x: hidden;
-  }
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
