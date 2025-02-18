@@ -305,7 +305,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white md:overflow-x-visible">
+    <div className="min-h-screen bg-black text-white">
       <Preloader isLoading={isLoading} />
       <nav className={`fixed w-full z-50 transition-colors duration-300 ${isScrolled ? 'bg-black' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 py-6">
