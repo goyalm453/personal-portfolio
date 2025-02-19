@@ -15,7 +15,6 @@ interface ChatBotProps {
   onClose: () => void;
 }
 
-// Custom avatar URLs from Unsplash
 const AI_AVATAR_URL = "/my-avatar.png";
 const USER_AVATAR_URL = "/hippie_4526032.png";
 
@@ -69,7 +68,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const [isFocused, setIsFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const previousInputRef = useRef('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -122,17 +120,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const handleInputFocus = () => {
     setIsFocused(true);
     setDisplayedSuggestion('');
-    previousInputRef.current = input;
-    setInput('');
   };
 
-  const handleInputBlur = () => {
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.relatedTarget?.getAttribute('type') === 'submit') {
+      return;
+    }
+    
     setIsFocused(false);
     if (input.trim() === '') {
       setInput('');
       setDisplayedSuggestion('');
-    } else {
-      setInput(previousInputRef.current);
     }
   };
 
@@ -206,6 +204,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
     const userInput = input.trim();
     setInput('');
     setIsLoading(true);
+    setIsFocused(false);
 
     try {
       const detectedLanguage = await detectLanguage(userInput);
