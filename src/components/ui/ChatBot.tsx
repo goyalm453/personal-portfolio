@@ -8,6 +8,7 @@ interface Message {
   content: string;
   language?: string;
   isTypingComplete?: boolean;
+  id?: string; // Add unique ID for messages
 }
 
 interface ChatBotProps {
@@ -22,7 +23,8 @@ const WELCOME_MESSAGE = {
   type: 'bot' as const,
   content: "Hey there! 👋 I'm Mohit's digital assistant. I'd love to tell you all about his journey, skills, and the amazing projects he's worked on. What would you like to know?",
   language: 'en',
-  isTypingComplete: true
+  isTypingComplete: true,
+  id: 'welcome'
 };
 
 const SUGGESTIONS = [
@@ -58,6 +60,55 @@ const formatMessageContent = (content: string) => {
 
   return content;
 };
+
+const TypedMessage: React.FC<{ message: Message }> = React.memo(({ message }) => {
+  const [displayedContent, setDisplayedContent] = useState(
+    message.isTypingComplete ? formatMessageContent(message.content) : ''
+  );
+  const contentRef = useRef(message.content);
+  const typingRef = useRef<NodeJS.Timeout | null>(null);
+  const [isTyping, setIsTyping] = useState(!message.isTypingComplete);
+
+  useEffect(() => {
+    if (!isTyping || message.isTypingComplete) {
+      setDisplayedContent(formatMessageContent(message.content));
+      return;
+    }
+
+    const words = message.content.split(' ');
+    let currentIndex = 0;
+
+    const typeWord = () => {
+      if (currentIndex < words.length) {
+        setDisplayedContent(prev => 
+          formatMessageContent(prev + (prev ? ' ' : '') + words[currentIndex])
+        );
+        currentIndex++;
+        typingRef.current = setTimeout(typeWord, 50);
+      } else {
+        setIsTyping(false);
+      }
+    };
+
+    typingRef.current = setTimeout(typeWord, 50);
+
+    return () => {
+      if (typingRef.current) {
+        clearTimeout(typingRef.current);
+      }
+    };
+  }, [message.content, message.isTypingComplete, isTyping]);
+
+  return (
+    <div 
+      className="text-base md:text-lg"
+      dangerouslySetInnerHTML={{ __html: displayedContent }}
+    />
+  );
+}, (prevProps, nextProps) => {
+  return prevProps.message.id === nextProps.message.id && 
+         prevProps.message.isTypingComplete === nextProps.message.isTypingComplete;
+});
 
 const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
@@ -149,54 +200,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
     setShowClearConfirm(false);
   };
 
-  const TypedMessage: React.FC<{ message: Message, index: number }> = ({ message, index }) => {
-    const [displayedContent, setDisplayedContent] = useState(message.isTypingComplete ? formatMessageContent(message.content) : '');
-    const contentRef = useRef(message.content);
-    const typingRef = useRef<number | null>(null);
-
-    useEffect(() => {
-      if (message.isTypingComplete || message.content !== contentRef.current) {
-        setDisplayedContent(formatMessageContent(message.content));
-        contentRef.current = message.content;
-        return;
-      }
-
-      if (!message.isTypingComplete) {
-        const words = message.content.split(' ');
-        let currentIndex = 0;
-
-        typingRef.current = window.setInterval(() => {
-          if (currentIndex < words.length) {
-            setDisplayedContent(prev => 
-              formatMessageContent(prev + (prev ? ' ' : '') + words[currentIndex])
-            );
-            currentIndex++;
-          } else {
-            if (typingRef.current) {
-              clearInterval(typingRef.current);
-            }
-            setMessages(prev => prev.map((m, i) => 
-              i === index ? { ...m, isTypingComplete: true } : m
-            ));
-          }
-        }, 50);
-
-        return () => {
-          if (typingRef.current) {
-            clearInterval(typingRef.current);
-          }
-        };
-      }
-    }, [message.content, message.isTypingComplete, index]);
-
-    return (
-      <div 
-        className="text-base md:text-lg"
-        dangerouslySetInnerHTML={{ __html: displayedContent }}
-      />
-    );
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -213,7 +216,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
         type: 'user', 
         content: userInput,
         language: detectedLanguage,
-        isTypingComplete: true
+        isTypingComplete: true,
+        id: `user-${Date.now()}`
       };
       setMessages(prev => [...prev, userMessage]);
 
@@ -223,7 +227,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
           type: 'bot',
           content: "I'll be happy to share Mohit's resume with you! You can download it right away. 📄",
           language: detectedLanguage,
-          isTypingComplete: true
+          isTypingComplete: true,
+          id: `bot-${Date.now()}`
         };
         setMessages(prev => [...prev, resumeMessage]);
         handleDownloadResume();
@@ -235,7 +240,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
           type: 'bot', 
           content: formattedResponse,
           language: detectedLanguage,
-          isTypingComplete: false
+          isTypingComplete: false,
+          id: `bot-${Date.now()}`
         };
         setMessages(prev => [...prev, botMessage]);
       }
@@ -245,7 +251,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
         type: 'bot',
         content: "I'm having a bit of trouble processing that right now. Could you please try asking again? 🙏",
         language: 'en',
-        isTypingComplete: true
+        isTypingComplete: true,
+        id: `error-${Date.now()}`
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -333,9 +340,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
 
           {/* Messages */}
           <div className="p-4 h-[calc(100%-8rem)] overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800 custom-scrollbar">
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <motion.div
-                key={index}
+                key={message.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -360,16 +367,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
                   } ${message.language === 'hi' ? 'font-hindi' : ''} transition-all hover:shadow-xl`}
                   dir={message.language === 'ar' ? 'rtl' : 'ltr'}
                 >
-                  {!message.isTypingComplete ? (
-                    <TypedMessage message={message} index={index} />
-                  ) : (
-                    <div 
-                      className="text-base md:text-lg"
-                      dangerouslySetInnerHTML={{ 
-                        __html: formatMessageContent(message.content)
-                      }}
-                    />
-                  )}
+                  <TypedMessage message={message} />
                 </div>
                 {message.type === 'user' && (
                   <div className="relative">
