@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Loader2, Trash2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { detectLanguage, getGeminiResponse, formatResponse } from '../../lib/gemini';
 
 interface Message {
   type: 'user' | 'bot';
@@ -14,7 +15,7 @@ interface ChatBotProps {
   onClose: () => void;
 }
 
-// Custom avatar URLs
+// Custom avatar URLs from Unsplash
 const AI_AVATAR_URL = "/my-avatar.png";
 const USER_AVATAR_URL = "/hippie_4526032.png";
 
@@ -122,6 +123,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
     setIsFocused(true);
     setDisplayedSuggestion('');
     previousInputRef.current = input;
+    setInput('');
   };
 
   const handleInputBlur = () => {
@@ -129,6 +131,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
     if (input.trim() === '') {
       setInput('');
       setDisplayedSuggestion('');
+    } else {
+      setInput(previousInputRef.current);
     }
   };
 
@@ -203,41 +207,51 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
     setInput('');
     setIsLoading(true);
 
-    // Add user message
-    const userMessage: Message = {
-      type: 'user',
-      content: userInput,
-      language: 'en',
-      isTypingComplete: true
-    };
-    setMessages(prev => [...prev, userMessage]);
+    try {
+      const detectedLanguage = await detectLanguage(userInput);
 
-    // Check for resume-related keywords
-    const resumeKeywords = ['resume', 'cv', 'download resume', 'get resume', 'रेज्यूमे', 'सीवी'];
-    if (resumeKeywords.some(keyword => userInput.toLowerCase().includes(keyword))) {
-      const resumeMessage: Message = {
-        type: 'bot',
-        content: "I'll be happy to share Mohit's resume with you! You can download it right away. 📄",
-        language: 'en',
-        isTypingComplete: false
+      const userMessage: Message = { 
+        type: 'user', 
+        content: userInput,
+        language: detectedLanguage,
+        isTypingComplete: true
       };
-      setMessages(prev => [...prev, resumeMessage]);
-      handleDownloadResume();
+      setMessages(prev => [...prev, userMessage]);
+
+      const resumeKeywords = ['resume', 'cv', 'download resume', 'get resume', 'रेज्यूमे', 'सीवी'];
+      if (resumeKeywords.some(keyword => userInput.toLowerCase().includes(keyword))) {
+        const resumeMessage: Message = {
+          type: 'bot',
+          content: "I'll be happy to share Mohit's resume with you! You can download it right away. 📄",
+          language: detectedLanguage,
+          isTypingComplete: true
+        };
+        setMessages(prev => [...prev, resumeMessage]);
+        handleDownloadResume();
+      } else {
+        const response = await getGeminiResponse(userInput, detectedLanguage);
+        const formattedResponse = formatResponse(response, detectedLanguage);
+
+        const botMessage: Message = { 
+          type: 'bot', 
+          content: formattedResponse,
+          language: detectedLanguage,
+          isTypingComplete: false
+        };
+        setMessages(prev => [...prev, botMessage]);
+      }
+    } catch (error) {
+      console.error('Error in chat:', error);
+      const errorMessage: Message = {
+        type: 'bot',
+        content: "I'm having a bit of trouble processing that right now. Could you please try asking again? 🙏",
+        language: 'en',
+        isTypingComplete: true
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    // Simulate bot response
-    setTimeout(() => {
-      const botMessage: Message = {
-        type: 'bot',
-        content: `I understand you're asking about "${userInput}". Let me help you with that! Currently, I'm being configured to provide detailed information about Mohit's background and expertise. Please check back soon for comprehensive responses.`,
-        language: 'en',
-        isTypingComplete: false
-      };
-      setMessages(prev => [...prev, botMessage]);
-      setIsLoading(false);
-    }, 1000);
   };
 
   return (
@@ -347,7 +361,16 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
                   } ${message.language === 'hi' ? 'font-hindi' : ''} transition-all hover:shadow-xl`}
                   dir={message.language === 'ar' ? 'rtl' : 'ltr'}
                 >
-                  <TypedMessage message={message} index={index} />
+                  {!message.isTypingComplete ? (
+                    <TypedMessage message={message} index={index} />
+                  ) : (
+                    <div 
+                      className="text-base md:text-lg"
+                      dangerouslySetInnerHTML={{ 
+                        __html: formatMessageContent(message.content)
+                      }}
+                    />
+                  )}
                 </div>
                 {message.type === 'user' && (
                   <div className="relative">
@@ -389,7 +412,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
               </div>
               <button
                 type="submit"
-                disabled={isLoading || !input.trim()}
+                disabled={isLoading}
                 className="p-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full text-white hover:opacity-90 transition-all disabled:opacity-50 shadow-lg hover:shadow-cyan-500/20 active:scale-95"
               >
                 {isLoading ? (
