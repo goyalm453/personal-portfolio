@@ -69,7 +69,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const [isFocused, setIsFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const previousInputRef = useRef('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -122,18 +121,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const handleInputFocus = () => {
     setIsFocused(true);
     setDisplayedSuggestion('');
-    previousInputRef.current = input;
-    setInput('');
   };
 
   const handleInputBlur = () => {
     setIsFocused(false);
-    if (input.trim() === '') {
-      setInput('');
-      setDisplayedSuggestion('');
-    } else {
-      setInput(previousInputRef.current);
-    }
   };
 
   const handleDownloadResume = () => {
@@ -412,7 +403,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
               </div>
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={!input.trim() || isLoading}
                 className="p-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full text-white hover:opacity-90 transition-all disabled:opacity-50 shadow-lg hover:shadow-cyan-500/20 active:scale-95"
               >
                 {isLoading ? (
