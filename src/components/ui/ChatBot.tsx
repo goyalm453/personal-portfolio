@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Loader2, Trash2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { detectLanguage, getGeminiResponse, formatResponse } from '../../lib/gemini';
 
 interface Message {
   type: 'user' | 'bot';
@@ -14,7 +15,7 @@ interface ChatBotProps {
   onClose: () => void;
 }
 
-// Custom avatar URLs
+// Custom avatar URLs from Unsplash
 const AI_AVATAR_URL = "/my-avatar.png";
 const USER_AVATAR_URL = "/hippie_4526032.png";
 
@@ -68,7 +69,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const [isFocused, setIsFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const previousInputRef = useRef('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -121,12 +122,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const handleInputFocus = () => {
     setIsFocused(true);
     setDisplayedSuggestion('');
+    previousInputRef.current = input;
+    setInput('');
   };
 
   const handleInputBlur = () => {
     setIsFocused(false);
     if (input.trim() === '') {
+      setInput('');
       setDisplayedSuggestion('');
+    } else {
+      setInput(previousInputRef.current);
     }
   };
 
@@ -195,39 +201,41 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmedInput = input.trim();
-    
-    if (!trimmedInput || isLoading) return;
+    if (!input.trim() || isLoading) return;
 
+    const userInput = input.trim();
+    setInput('');
     setIsLoading(true);
 
     try {
+      const detectedLanguage = await detectLanguage(userInput);
+
       const userMessage: Message = { 
         type: 'user', 
-        content: trimmedInput,
-        language: 'en',
+        content: userInput,
+        language: detectedLanguage,
         isTypingComplete: true
       };
-      
       setMessages(prev => [...prev, userMessage]);
-      setInput(''); // Clear input after adding message
 
       const resumeKeywords = ['resume', 'cv', 'download resume', 'get resume', 'रेज्यूमे', 'सीवी'];
-      if (resumeKeywords.some(keyword => trimmedInput.toLowerCase().includes(keyword))) {
+      if (resumeKeywords.some(keyword => userInput.toLowerCase().includes(keyword))) {
         const resumeMessage: Message = {
           type: 'bot',
           content: "I'll be happy to share Mohit's resume with you! You can download it right away. 📄",
-          language: 'en',
+          language: detectedLanguage,
           isTypingComplete: true
         };
         setMessages(prev => [...prev, resumeMessage]);
         handleDownloadResume();
       } else {
-        // Simulated bot response
+        const response = await getGeminiResponse(userInput, detectedLanguage);
+        const formattedResponse = formatResponse(response, detectedLanguage);
+
         const botMessage: Message = { 
           type: 'bot', 
-          content: "I understand you're interested in knowing more. Let me help you with that!",
-          language: 'en',
+          content: formattedResponse,
+          language: detectedLanguage,
           isTypingComplete: false
         };
         setMessages(prev => [...prev, botMessage]);
@@ -386,7 +394,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
             <div className="flex gap-3">
               <div className="relative flex-1">
                 <input
-                  ref={inputRef}
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -405,7 +412,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
               </div>
               <button
                 type="submit"
-                disabled={isLoading || !input.trim()}
+                disabled={isLoading}
                 className="p-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full text-white hover:opacity-90 transition-all disabled:opacity-50 shadow-lg hover:shadow-cyan-500/20 active:scale-95"
               >
                 {isLoading ? (
