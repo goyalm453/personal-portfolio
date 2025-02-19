@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Minus, Square, X, ExternalLink, Linkedin, Smartphone, FileText, Download } from 'lucide-react';
+import { Minus, Square, X, ExternalLink, Linkedin, Smartphone, FileText, Download, Maximize2 } from 'lucide-react';
 
 interface MacWindowProps {
   isOpen: boolean;
@@ -17,6 +17,7 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
   const [redirecting, setRedirecting] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
   const [isPDF, setIsPDF] = useState(false);
+  const [pdfLoadError, setPdfLoadError] = useState(false);
   const [windowDimensions, setWindowDimensions] = useState({
     width: 0,
     height: 0
@@ -31,6 +32,7 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
   // Check if the file is a PDF
   useEffect(() => {
     setIsPDF(url.toLowerCase().endsWith('.pdf'));
+    setPdfLoadError(false);
   }, [url]);
 
   // Update window dimensions on resize
@@ -209,6 +211,69 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
   const isDocument = /\.(pdf|doc|docx|xls|xlsx|png|jpg|jpeg|gif)$/i.test(url);
   const displayName = getDisplayName(url);
 
+  const renderPDFViewer = () => {
+    return (
+      <div className="relative w-full h-full bg-gray-900">
+        <div className="absolute top-0 left-0 right-0 p-2 flex justify-end space-x-2 bg-gray-800/50 backdrop-blur-sm z-10">
+          <button
+            onClick={() => window.open(url, '_blank')}
+            className="inline-flex items-center space-x-2 px-3 py-1.5 rounded bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm transition-colors"
+          >
+            <Maximize2 className="w-4 h-4" />
+            <span>Open in New Tab</span>
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            className="inline-flex items-center space-x-2 px-3 py-1.5 rounded bg-gray-700/50 hover:bg-gray-700 text-white text-sm transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download</span>
+          </button>
+        </div>
+        
+        <iframe
+          src={url}
+          className="w-full h-full border-none bg-white"
+          style={{
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            backgroundColor: 'white'
+          }}
+          onError={() => setPdfLoadError(true)}
+        />
+
+        {pdfLoadError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+            <div className="text-center space-y-4 p-8">
+              <FileText className="w-16 h-16 mx-auto text-cyan-400" />
+              <h3 className="text-xl font-semibold text-white">Unable to Preview PDF</h3>
+              <p className="text-gray-400 max-w-md">
+                The PDF preview couldn't be loaded. You can try:
+              </p>
+              <div className="flex flex-col space-y-2">
+                <button
+                  onClick={() => window.open(url, '_blank')}
+                  className="inline-flex items-center justify-center space-x-2 px-4 py-2 rounded bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Open in New Tab</span>
+                </button>
+                <button
+                  onClick={handleDownloadPDF}
+                  className="inline-flex items-center justify-center space-x-2 px-4 py-2 rounded bg-gray-700/50 hover:bg-gray-700 text-white transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download PDF</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderContent = () => {
     if (isRestrictedContent && platformContent) {
       return (
@@ -252,34 +317,8 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
       );
     }
 
-    if (isPDF && isMobile) {
-      return (
-        <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 space-y-6 p-8">
-          <div className="text-center max-w-md">
-            <FileText className="w-16 h-16 mx-auto mb-4 text-cyan-400" />
-            <h3 className="text-xl font-semibold mb-2">PDF Document</h3>
-            <p className="text-gray-400 mb-6">
-              For the best experience on mobile devices, you can:
-            </p>
-            <div className="space-y-4">
-              <button
-                onClick={() => window.open(url, '_blank')}
-                className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2 rounded bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 transition-colors"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>Open in Browser</span>
-              </button>
-              <button
-                onClick={handleDownloadPDF}
-                className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2 rounded bg-gray-700/50 hover:bg-gray-700 text-white transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                <span>Download PDF</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      );
+    if (isPDF) {
+      return renderPDFViewer();
     }
 
     return (
