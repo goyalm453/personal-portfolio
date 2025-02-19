@@ -8,6 +8,7 @@ interface Message {
   content: string;
   language?: string;
   isTypingComplete?: boolean;
+  id?: string; // Add unique identifier for messages
 }
 
 interface ChatBotProps {
@@ -23,7 +24,8 @@ const WELCOME_MESSAGE = {
   type: 'bot' as const,
   content: "Hey there! 👋 I'm Mohit's digital assistant. I'd love to tell you all about his journey, skills, and the amazing projects he's worked on. What would you like to know?",
   language: 'en',
-  isTypingComplete: true
+  isTypingComplete: true,
+  id: 'welcome'
 };
 
 const SUGGESTIONS = [
@@ -59,6 +61,9 @@ const formatMessageContent = (content: string) => {
 
   return content;
 };
+
+// Generate unique ID for messages
+const generateMessageId = () => `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
 const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
@@ -147,45 +152,43 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
     setShowClearConfirm(false);
   };
 
-  const TypedMessage: React.FC<{ message: Message, index: number }> = ({ message, index }) => {
-    const [displayedContent, setDisplayedContent] = useState(message.isTypingComplete ? formatMessageContent(message.content) : '');
-    const contentRef = useRef(message.content);
-    const typingRef = useRef<number | null>(null);
+  const TypedMessage: React.FC<{ message: Message }> = ({ message }) => {
+    const [displayedContent, setDisplayedContent] = useState('');
+    const [isTyping, setIsTyping] = useState(!message.isTypingComplete);
+    const typingRef = useRef<NodeJS.Timeout | null>(null);
+    const wordsRef = useRef(message.content.split(' '));
+    const currentIndexRef = useRef(0);
 
     useEffect(() => {
-      if (message.isTypingComplete || message.content !== contentRef.current) {
+      if (!isTyping || message.isTypingComplete) {
         setDisplayedContent(formatMessageContent(message.content));
-        contentRef.current = message.content;
         return;
       }
 
-      if (!message.isTypingComplete) {
-        const words = message.content.split(' ');
-        let currentIndex = 0;
+      const typeNextWord = () => {
+        if (currentIndexRef.current < wordsRef.current.length) {
+          setDisplayedContent(prev => {
+            const newContent = prev + (prev ? ' ' : '') + wordsRef.current[currentIndexRef.current];
+            return formatMessageContent(newContent);
+          });
+          currentIndexRef.current++;
+          typingRef.current = setTimeout(typeNextWord, 50);
+        } else {
+          setIsTyping(false);
+          setMessages(prev => 
+            prev.map(m => m.id === message.id ? { ...m, isTypingComplete: true } : m)
+          );
+        }
+      };
 
-        typingRef.current = window.setInterval(() => {
-          if (currentIndex < words.length) {
-            setDisplayedContent(prev => 
-              formatMessageContent(prev + (prev ? ' ' : '') + words[currentIndex])
-            );
-            currentIndex++;
-          } else {
-            if (typingRef.current) {
-              clearInterval(typingRef.current);
-            }
-            setMessages(prev => prev.map((m, i) => 
-              i === index ? { ...m, isTypingComplete: true } : m
-            ));
-          }
-        }, 50);
+      typingRef.current = setTimeout(typeNextWord, 50);
 
-        return () => {
-          if (typingRef.current) {
-            clearInterval(typingRef.current);
-          }
-        };
-      }
-    }, [message.content, message.isTypingComplete, index]);
+      return () => {
+        if (typingRef.current) {
+          clearTimeout(typingRef.current);
+        }
+      };
+    }, [message.content, message.isTypingComplete, message.id, isTyping]);
 
     return (
       <div 
@@ -212,7 +215,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
         type: 'user', 
         content: userInput,
         language: detectedLanguage,
-        isTypingComplete: true
+        isTypingComplete: true,
+        id: generateMessageId()
       };
       setMessages(prev => [...prev, userMessage]);
 
@@ -222,7 +226,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
           type: 'bot',
           content: "I'll be happy to share Mohit's resume with you! You can download it right away. 📄",
           language: detectedLanguage,
-          isTypingComplete: true
+          isTypingComplete: true,
+          id: generateMessageId()
         };
         setMessages(prev => [...prev, resumeMessage]);
         handleDownloadResume();
@@ -234,7 +239,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
           type: 'bot', 
           content: formattedResponse,
           language: detectedLanguage,
-          isTypingComplete: false
+          isTypingComplete: false,
+          id: generateMessageId()
         };
         setMessages(prev => [...prev, botMessage]);
       }
@@ -244,7 +250,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
         type: 'bot',
         content: "I'm having a bit of trouble processing that right now. Could you please try asking again? 🙏",
         language: 'en',
-        isTypingComplete: true
+        isTypingComplete: true,
+        id: generateMessageId()
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -336,9 +343,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
 
           {/* Messages */}
           <div className="p-4 h-[calc(100%-8rem)] overflow-y-auto bg-gradient-to-b from-gray-900 to-gray-800 custom-scrollbar">
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <motion.div
-                key={index}
+                key={message.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -363,16 +370,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
                   } ${message.language === 'hi' ? 'font-hindi' : ''} transition-all hover:shadow-xl`}
                   dir={message.language === 'ar' ? 'rtl' : 'ltr'}
                 >
-                  {!message.isTypingComplete ? (
-                    <TypedMessage message={message} index={index} />
-                  ) : (
-                    <div 
-                      className="text-base md:text-lg"
-                      dangerouslySetInnerHTML={{ 
-                        __html: formatMessageContent(message.content)
-                      }}
-                    />
-                  )}
+                  <TypedMessage message={message} />
                 </div>
                 {message.type === 'user' && (
                   <div className="relative">
