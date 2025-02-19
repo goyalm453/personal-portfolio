@@ -70,6 +70,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isSubmittingRef = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -196,8 +197,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
+    
+    if (!input.trim() || isLoading || isSubmittingRef.current) return;
+    
+    isSubmittingRef.current = true;
     const userInput = input.trim();
     setInput('');
     setIsLoading(true);
@@ -246,6 +249,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      isSubmittingRef.current = false;
       if (inputRef.current) {
         inputRef.current.focus();
       }
@@ -411,7 +415,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
               </div>
               <button
                 type="submit"
-                disabled={isLoading || !input.trim()}
+                disabled={isLoading || !input.trim() || isSubmittingRef.current}
                 className="p-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full text-white hover:opacity-90 transition-all disabled:opacity-50 shadow-lg hover:shadow-cyan-500/20 active:scale-95"
               >
                 {isLoading ? (
