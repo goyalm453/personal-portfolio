@@ -186,10 +186,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   };
 
   const handleDownloadResume = () => {
-    const resumeUrl = '/resume/Mohit_Goyal_Resume.pdf';
+    const resumeUrl = '/MohitGoyal.pdf';
     const link = document.createElement('a');
     link.href = resumeUrl;
-    link.download = 'Mohit_Goyal_Resume.pdf';
+    link.download = 'MohitGoyal.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
