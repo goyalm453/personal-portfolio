@@ -8,7 +8,7 @@ interface Message {
   content: string;
   language?: string;
   isTypingComplete?: boolean;
-  id?: string; // Add unique ID for messages
+  id?: string;
 }
 
 interface ChatBotProps {
@@ -65,7 +65,6 @@ const TypedMessage: React.FC<{ message: Message }> = React.memo(({ message }) =>
   const [displayedContent, setDisplayedContent] = useState(
     message.isTypingComplete ? formatMessageContent(message.content) : ''
   );
-  const contentRef = useRef(message.content);
   const typingRef = useRef<NodeJS.Timeout | null>(null);
   const [isTyping, setIsTyping] = useState(!message.isTypingComplete);
 
