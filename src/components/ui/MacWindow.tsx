@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Minus, Square, X, ExternalLink, Linkedin, Smartphone, FileText, Download, Maximize2 } from 'lucide-react';
+import { Minus, Square, X, ExternalLink, Linkedin, Smartphone, FileText } from 'lucide-react';
 
 interface MacWindowProps {
   isOpen: boolean;
@@ -16,8 +16,6 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
   const [countdown, setCountdown] = useState(3);
   const [redirecting, setRedirecting] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
-  const [isPDF, setIsPDF] = useState(false);
-  const [pdfLoadError, setPdfLoadError] = useState(false);
   const [windowDimensions, setWindowDimensions] = useState({
     width: 0,
     height: 0
@@ -25,15 +23,18 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
 
   // Function to get document name from URL
   const getDisplayName = (url: string) => {
-    const filename = url.split('/').pop() || url;
-    return decodeURIComponent(filename);
+    // Check if it's a document type URL
+    const isDocument = /\.(pdf|doc|docx|xls|xlsx|png|jpg|jpeg|gif)$/i.test(url);
+    
+    if (isDocument) {
+      // Extract filename from URL
+      const filename = url.split('/').pop() || url;
+      // Decode URI components to handle special characters
+      return decodeURIComponent(filename);
+    }
+    
+    return url;
   };
-
-  // Check if the file is a PDF
-  useEffect(() => {
-    setIsPDF(url.toLowerCase().endsWith('.pdf'));
-    setPdfLoadError(false);
-  }, [url]);
 
   // Update window dimensions on resize
   useEffect(() => {
@@ -41,6 +42,7 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
       const width = window.innerWidth;
       const height = window.innerHeight;
       
+      // Calculate dimensions based on screen size
       let newWidth, newHeight;
       
       if (width <= 640) { // Mobile
@@ -66,6 +68,7 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
   }, []);
 
   useEffect(() => {
+    // Check if user is on mobile device
     const checkMobile = () => {
       const userAgent = navigator.userAgent || navigator.vendor;
       return /android|iphone|ipad|ipod/i.test(userAgent.toLowerCase());
@@ -89,6 +92,7 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
     }
   }, [url]);
 
+  // Control body scroll
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -101,6 +105,7 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
     };
   }, [isOpen]);
 
+  // Countdown and auto-redirect effect
   useEffect(() => {
     let timer: NodeJS.Timeout;
     
@@ -159,15 +164,6 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
     }
   };
 
-  const handleDownloadPDF = () => {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = getDisplayName(url);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const getPlatformContent = () => {
     switch (platform) {
       case 'behance':
@@ -210,131 +206,6 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
   const platformContent = getPlatformContent();
   const isDocument = /\.(pdf|doc|docx|xls|xlsx|png|jpg|jpeg|gif)$/i.test(url);
   const displayName = getDisplayName(url);
-
-  const renderPDFViewer = () => {
-    return (
-      <div className="relative w-full h-full bg-gray-900">
-        <div className="absolute top-0 left-0 right-0 p-2 flex justify-end space-x-2 bg-gray-800/50 backdrop-blur-sm z-10">
-          <button
-            onClick={() => window.open(url, '_blank')}
-            className="inline-flex items-center space-x-2 px-3 py-1.5 rounded bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 text-sm transition-colors"
-          >
-            <Maximize2 className="w-4 h-4" />
-            <span>Open in New Tab</span>
-          </button>
-          <button
-            onClick={handleDownloadPDF}
-            className="inline-flex items-center space-x-2 px-3 py-1.5 rounded bg-gray-700/50 hover:bg-gray-700 text-white text-sm transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            <span>Download</span>
-          </button>
-        </div>
-        
-        <iframe
-          src={url}
-          className="w-full h-full border-none bg-white"
-          style={{
-            width: '100%',
-            height: '100%',
-            border: 'none',
-            backgroundColor: 'white'
-          }}
-          onError={() => setPdfLoadError(true)}
-        />
-
-        {pdfLoadError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
-            <div className="text-center space-y-4 p-8">
-              <FileText className="w-16 h-16 mx-auto text-cyan-400" />
-              <h3 className="text-xl font-semibold text-white">Unable to Preview PDF</h3>
-              <p className="text-gray-400 max-w-md">
-                The PDF preview couldn't be loaded. You can try:
-              </p>
-              <div className="flex flex-col space-y-2">
-                <button
-                  onClick={() => window.open(url, '_blank')}
-                  className="inline-flex items-center justify-center space-x-2 px-4 py-2 rounded bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  <span>Open in New Tab</span>
-                </button>
-                <button
-                  onClick={handleDownloadPDF}
-                  className="inline-flex items-center justify-center space-x-2 px-4 py-2 rounded bg-gray-700/50 hover:bg-gray-700 text-white transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download PDF</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderContent = () => {
-    if (isRestrictedContent && platformContent) {
-      return (
-        <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 space-y-4 p-8">
-          <div className="text-center max-w-md">
-            <h3 className="text-xl font-semibold mb-2">{platformContent.title}</h3>
-            <p className="text-gray-400 mb-4">{platformContent.description}</p>
-            <div className="space-y-4">
-              <button
-                onClick={openContent}
-                className={`inline-flex items-center space-x-2 px-4 py-2 rounded ${platformContent.bgColor} hover:${platformContent.hoverBgColor} ${platformContent.textColor} transition-colors`}
-              >
-                <span>{platformContent.buttonText}</span>
-                {platformContent.icon}
-              </button>
-              <AnimatePresence>
-                {showTimer && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="flex flex-col items-center space-y-2"
-                  >
-                    <div className="h-1 w-32 bg-gray-800 rounded-full overflow-hidden">
-                      <motion.div
-                        className={`h-full ${platformContent.bgColor}`}
-                        initial={{ width: "100%" }}
-                        animate={{ width: "0%" }}
-                        transition={{ duration: 3, ease: "linear" }}
-                      />
-                    </div>
-                    <p className="text-sm text-gray-400">
-                      Redirecting in {countdown} seconds...
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (isPDF) {
-      return renderPDFViewer();
-    }
-
-    return (
-      <iframe
-        src={url}
-        className="w-full h-full border-none bg-white"
-        title="Content Preview"
-        style={{
-          width: '100%',
-          height: '100%',
-          border: 'none',
-          backgroundColor: 'white'
-        }}
-      />
-    );
-  };
 
   return (
     <AnimatePresence>
@@ -398,11 +269,72 @@ const MacWindow: React.FC<MacWindowProps> = ({ isOpen, onClose, url }) => {
                   {isDocument && <FileText className="w-4 h-4" />}
                   {displayName}
                 </div>
+                {isRestrictedContent && platformContent && (
+                  <button
+                    onClick={openContent}
+                    className={`flex items-center space-x-1 px-3 py-0.5 rounded ${platformContent.bgColor} hover:${platformContent.hoverBgColor} ${platformContent.textColor} text-sm transition-colors`}
+                  >
+                    <span>{platformContent.buttonText}</span>
+                    {platformContent.icon}
+                  </button>
+                )}
               </div>
             </div>
 
             <div className="w-full h-[calc(100%-2rem)] bg-gray-900">
-              {renderContent()}
+              {isRestrictedContent && platformContent ? (
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 space-y-4 p-8">
+                  <div className="text-center max-w-md">
+                    <h3 className="text-xl font-semibold mb-2">{platformContent.title}</h3>
+                    <p className="text-gray-400 mb-4">
+                      {platformContent.description}
+                    </p>
+                    <div className="space-y-4">
+                      <button
+                        onClick={openContent}
+                        className={`inline-flex items-center space-x-2 px-4 py-2 rounded ${platformContent.bgColor} hover:${platformContent.hoverBgColor} ${platformContent.textColor} transition-colors`}
+                      >
+                        <span>{platformContent.buttonText}</span>
+                        {platformContent.icon}
+                      </button>
+                      <AnimatePresence>
+                        {showTimer && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="flex flex-col items-center space-y-2"
+                          >
+                            <div className="h-1 w-32 bg-gray-800 rounded-full overflow-hidden">
+                              <motion.div
+                                className={`h-full ${platformContent.bgColor}`}
+                                initial={{ width: "100%" }}
+                                animate={{ width: "0%" }}
+                                transition={{ duration: 3, ease: "linear" }}
+                              />
+                            </div>
+                            <p className="text-sm text-gray-400">
+                              Redirecting in {countdown} seconds...
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <iframe
+                  src={url}
+                  className="w-full h-full border-none bg-white"
+                  title="Content Preview"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                    backgroundColor: 'white'
+                  }}
+                />
+              )}
             </div>
           </motion.div>
         </>
