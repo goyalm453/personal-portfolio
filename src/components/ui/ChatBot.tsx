@@ -199,11 +199,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
     );
   };
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-    
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     const userInput = input.trim();
@@ -255,10 +252,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSendClick = () => {
-    handleSubmit();
   };
 
   return (
@@ -418,9 +411,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
                 )}
               </div>
               <button
-                type="button"
-                onClick={handleSendClick}
-                disabled={isLoading || !input.trim()}
+                type="submit"
+                disabled={isLoading}
                 className="p-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full text-white hover:opacity-90 transition-all disabled:opacity-50 shadow-lg hover:shadow-cyan-500/20 active:scale-95"
               >
                 {isLoading ? (
