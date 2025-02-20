@@ -239,17 +239,17 @@ function App() {
     
     {
       name: "Twitter",
-      image: "/twitter.png",
+      image: "/twitter.webp",
       url: "https://twitter.com/goyalm453"
     },
     {
       name: "Instagram",
-      image: "/instagram.png",
+      image: "/instagram.webp",
       url: "https://instagram.com/mohit_1218"
     },
     {
       name: "LinkedIn",
-      image: "/linkdein.png",
+      image: "/linkdein.webp",
       url: "https://www.linkedin.com/in/mohit-goyal-904982230/"
     },
     {
