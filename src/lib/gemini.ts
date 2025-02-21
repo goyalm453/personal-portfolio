@@ -10,7 +10,7 @@ Personal Information:
 - Location: Noida, Uttar Pradesh
 - Contact: +91 9354978215
 - Email: goyalm453@gmail.com
-- LinkedIn: https://www.linkedin.com/in/mohit-goyal-904982230/
+- LinkedIn: https://lnkd.in/d4w5_r8q
 - Behance: https://www.behance.net/mohitgoyal453
 - Twitter: https://x.com/goyalm453
 
