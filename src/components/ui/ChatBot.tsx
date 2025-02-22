@@ -87,6 +87,8 @@ const TypedMessage: React.FC<{ message: Message }> = React.memo(({ message }) =>
         typingRef.current = setTimeout(typeWord, 50);
       } else {
         setIsTyping(false);
+        // Mark the message as complete after typing
+        message.isTypingComplete = true;
       }
     };
 
@@ -111,7 +113,9 @@ const TypedMessage: React.FC<{ message: Message }> = React.memo(({ message }) =>
 });
 
 const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
-  const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
+  // Use ref to persist messages across renders
+  const messagesRef = useRef<Message[]>([WELCOME_MESSAGE]);
+  const [messages, setMessages] = useState<Message[]>(messagesRef.current);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -120,13 +124,20 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Update messagesRef when messages change
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (isOpen) {
+      scrollToBottom();
+    }
+  }, [isOpen, messages]);
 
   const typeAndErase = async (text: string) => {
     for (let i = 0; i <= text.length; i++) {
@@ -196,7 +207,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   };
 
   const handleClearChat = () => {
-    setMessages([WELCOME_MESSAGE]);
+    const welcomeMessage = { ...WELCOME_MESSAGE, id: `welcome-${Date.now()}` };
+    setMessages([welcomeMessage]);
+    messagesRef.current = [welcomeMessage];
     setShowClearConfirm(false);
   };
 
