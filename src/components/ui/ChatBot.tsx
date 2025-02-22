@@ -41,19 +41,20 @@ const BACKSPACE_SPEED = 50;
 const PAUSE_DURATION = 2000;
 
 const formatMessageContent = (content: string) => {
+  // Improved link formatting with word-break
   content = content.replace(
     /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi,
-    '<a href="mailto:$1" class="text-cyan-400 hover:text-cyan-300 underline">$1</a>'
+    '<a href="mailto:$1" class="text-cyan-400 hover:text-cyan-300 underline break-all">$1</a>'
   );
 
   content = content.replace(
     /(\+?\d{1,4}[-.\s]?\(?\d{1,3}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9})/g,
-    '<a href="tel:$1" class="text-cyan-400 hover:text-cyan-300 underline">$1</a>'
+    '<a href="tel:$1" class="text-cyan-400 hover:text-cyan-300 underline break-all">$1</a>'
   );
 
   content = content.replace(
     /(https?:\/\/[^\s<]+)/g,
-    '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline">$1</a>'
+    '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline break-all">$1</a>'
   );
 
   content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -100,7 +101,7 @@ const TypedMessage: React.FC<{ message: Message }> = React.memo(({ message }) =>
 
   return (
     <div 
-      className="text-base md:text-lg"
+      className="text-base md:text-lg break-words"
       dangerouslySetInnerHTML={{ __html: displayedContent }}
     />
   );
@@ -350,7 +351,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
                 }`}
               >
                 {message.type === 'bot' && (
-                  <div className="relative">
+                  <div className="flex-shrink-0">
                     <img 
                       src={AI_AVATAR_URL}
                       alt="AI" 
@@ -359,17 +360,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] p-4 rounded-2xl shadow-lg ${
+                  className={`max-w-[75%] p-4 rounded-2xl shadow-lg ${
                     message.type === 'user'
                       ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white'
                       : 'bg-gray-700/90 text-white backdrop-blur-sm'
-                  } ${message.language === 'hi' ? 'font-hindi' : ''} transition-all hover:shadow-xl`}
+                  } ${message.language === 'hi' ? 'font-hindi' : ''} transition-all hover:shadow-xl overflow-hidden`}
                   dir={message.language === 'ar' ? 'rtl' : 'ltr'}
                 >
                   <TypedMessage message={message} />
                 </div>
                 {message.type === 'user' && (
-                  <div className="relative">
+                  <div className="flex-shrink-0">
                     <img 
                       src={USER_AVATAR_URL}
                       alt="User" 
@@ -397,10 +398,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
                   onBlur={handleInputBlur}
                   placeholder={isFocused ? "Ask me anything..." : ""}
                   disabled={isLoading}
-                  className="w-full px-6 py-3 rounded-full bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 disabled:opacity-50 text-base transition-all border border-gray-600 hover:border-gray-500 focus:border-cyan-400"
+                  className="w-full px-4 sm:px-6 py-3 rounded-full bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 disabled:opacity-50 text-base transition-all border border-gray-600 hover:border-gray-500 focus:border-cyan-400"
                 />
                 {!isFocused && input === '' && (
-                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none whitespace-nowrap">
+                  <div className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-sm sm:text-base truncate pr-12 w-full">
                     Ask About Mohit's <span className="text-cyan-400">{displayedSuggestion}</span>
                     <span className="animate-pulse">|</span>
                   </div>
@@ -409,7 +410,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="p-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full text-white hover:opacity-90 transition-all disabled:opacity-50 shadow-lg hover:shadow-cyan-500/20 active:scale-95"
+                className="flex-shrink-0 p-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full text-white hover:opacity-90 transition-all disabled:opacity-50 shadow-lg hover:shadow-cyan-500/20 active:scale-95"
               >
                 {isLoading ? (
                   <Loader2 size={24} className="animate-spin" />
