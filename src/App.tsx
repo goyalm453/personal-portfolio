@@ -636,8 +636,8 @@ function App() {
           </motion.h3>
           
           <div className="relative w-full overflow-hidden">
-            <div className="absolute left-0 top-0 bottom-0 w-32 z-10 pointer-events-none bg-gradient-to-r from-black to-transparent"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-32 z-10 pointer-events-none bg-gradient-to-l from-black to-transparent"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-8 md:w-32 z-10 pointer-events-none bg-gradient-to-r from-black to-transparent"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-8 md:w-32 z-10 pointer-events-none bg-gradient-to-l from-black to-transparent"></div>
             
             <div className="flex overflow-hidden relative">
               <div className="flex infinite-scroll-container">
