@@ -216,22 +216,22 @@ function App() {
   const steps = [
     {
       title: "Planning and Organizing",
-      description: "We'll work together to plan your project, understand your goals, and create a strategy to reach your objectives.",
+      description: "I will work with you to plan your project, understand your goals, and create a strategy to achieve your objectives.",
       icon: "1️⃣"
     },
     {
       title: "Creating and Designing",
-      description: "After planning your project, we'll begin creating and designing to make a memorable impact online.",
+      description: "After planning, I will start creating and designing to make a lasting impact online.",
       icon: "2️⃣"
     },
     {
       title: "Delivering",
-      description: "We deliver everything and project management with regular updates to ensure you're happy with progress.",
+      description: "I will provide regular updates and manage the project to ensure you're satisfied with the progress.",
       icon: "3️⃣"
     },
     {
       title: "Launching",
-      description: "Once everything is ready, we'll launch with a carefully planned strategy to ensure success.",
+      description: "Once everything is ready, I will launch with a carefully planned strategy to ensure success.",
       icon: "4️⃣"
     }
   ];
