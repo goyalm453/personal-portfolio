@@ -532,7 +532,7 @@ function App() {
                 }}
               >
                 <img 
-                  src="/mo.png"
+                  src="/photo.jpg"
                   alt="Professional portrait"
                   className="about-image w-full h-[400px] md:h-[400px] object-cover"
                 />
