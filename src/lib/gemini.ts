@@ -1,7 +1,10 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 
-// Initialize Google Generative AI with your API key
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+// Initialize OpenAI with your API key
+const openai = new OpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true
+});
 
 // Resume data context
 const RESUME_CONTEXT = `
@@ -67,19 +70,17 @@ process
    - Implemented Monster's brand identity in the design
 `;
 
-// Function to detect language using Gemini
-export async function detectLanguage(_text: string): Promise<string> {
-  return 'en';
+// Function to detect language using OpenAI
+export async function detectLanguage(text: string): Promise<string> {
+  return 'en'; // Simplified for demo, you can implement language detection if needed
 }
 
-// Function to get response from Gemini in English with proper formatting
+// Function to get response from OpenAI in English with proper formatting
 export async function getGeminiResponse(
   prompt: string,
   _language: string
 ): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
     // Quick response for greetings
     if (/^(hi|hello|hey|namaste|नमस्ते|हाय|हैलो)/i.test(prompt)) {
       return "👋 Hi! Ask me anything about Mohit or any other topic!";
@@ -88,17 +89,28 @@ export async function getGeminiResponse(
     // Check if Mohit-related
     const isMohitRelated = /(mohit|mohit goyal)/i.test(prompt);
 
-    // Simplified prompts for faster processing
-    const systemPrompt = isMohitRelated
-      ? `Answer using ONLY this resume data:\n${RESUME_CONTEXT}\n\nQuestion: ${prompt}`
-      : `Be concise and helpful. Question: ${prompt}`;
+    // Prepare system message based on context
+    const systemMessage = isMohitRelated
+      ? `You are Mohit Goyal's AI assistant. Answer questions based ONLY on this resume data:\n${RESUME_CONTEXT}`
+      : 'You are a helpful AI assistant. Be concise and friendly in your responses.';
 
-    const result = await model.generateContent([
-      systemPrompt,
-      'Format: Use **bold**, bullet points, relevant emojis. Be brief.'
-    ]);
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: systemMessage
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 500
+    });
 
-    return result.response.text();
+    return completion.choices[0]?.message?.content || "I'm having trouble right now. Please try again. 🙏";
   } catch (error) {
     console.error('Error:', error);
     return "I'm having trouble right now. Please try again. 🙏";
@@ -107,5 +119,17 @@ export async function getGeminiResponse(
 
 // Function to format response based on language
 export function formatResponse(text: string, _language: string): string {
-  return text;
+  // Basic formatting for the response text
+  let formattedText = text;
+  
+  // Add line breaks for better readability
+  formattedText = formattedText.replace(/\n/g, '<br>');
+  
+  // Add emphasis to important points
+  formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // Format bullet points
+  formattedText = formattedText.replace(/•/g, '•');
+  
+  return formattedText;
 }
