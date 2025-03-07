@@ -68,16 +68,32 @@ process
 `;
 
 // Function to detect language using Gemini
-export async function detectLanguage(_text: string): Promise<string> {
-  return 'en';
+export async function detectLanguage(text: string): Promise<string> {
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const prompt = `Detect the language of this text and respond with only the ISO 639-1 language code (e.g., 'en' for English, 'hi' for Hindi): "${text}"`;
+    
+    const result = await model.generateContent(prompt);
+    const response = result.response.text().trim().toLowerCase();
+    
+    // Default to English if the response is not a valid language code
+    return response.match(/^[a-z]{2}$/) ? response : 'en';
+  } catch (error) {
+    console.error('Language detection error:', error);
+    return 'en'; // Default to English on error
+  }
 }
 
 // Function to get response from Gemini in English with proper formatting
 export async function getGeminiResponse(
   prompt: string,
-  _language: string
+  language: string
 ): Promise<string> {
   try {
+    if (!import.meta.env.VITE_GEMINI_API_KEY) {
+      throw new Error('Gemini API key is not configured');
+    }
+
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
     // Quick response for greetings
@@ -86,26 +102,94 @@ export async function getGeminiResponse(
     }
 
     // Check if Mohit-related
-    const isMohitRelated = /(mohit|mohit goyal)/i.test(prompt);
+    const isMohitRelated = /(mohit|mohit goyal|resume|cv|education|experience|skills|projects)/i.test(prompt);
 
-    // Simplified prompts for faster processing
+    // Enhanced system prompt with better context and instructions
     const systemPrompt = isMohitRelated
-      ? `Answer using ONLY this resume data:\n${RESUME_CONTEXT}\n\nQuestion: ${prompt}`
-      : `Be concise and helpful. Question: ${prompt}`;
+      ? `You are Mohit Goyal's AI assistant. Use this resume data to answer questions:\n${RESUME_CONTEXT}\n\nQuestion: ${prompt}\n\nProvide a natural, conversational response. Use bullet points for lists and highlight key information with **bold**. Keep responses concise and relevant.`
+      : `You are a helpful AI assistant. Question: ${prompt}\n\nProvide a clear, concise response. Use bullet points where appropriate and highlight key information with **bold**.`;
 
-    const result = await model.generateContent([
-      systemPrompt,
-      'Format: Use **bold**, bullet points, relevant emojis. Be brief.'
-    ]);
+    const result = await model.generateContent([systemPrompt]);
+    const response = result.response.text();
 
-    return result.response.text();
+    if (!response) {
+      throw new Error('Empty response from Gemini API');
+    }
+
+    return response;
   } catch (error) {
-    console.error('Error:', error);
-    return "I'm having trouble right now. Please try again. 🙏";
+    // Enhanced error logging
+    console.error('Gemini API Error:', {
+      error,
+      prompt,
+      language,
+      apiKey: import.meta.env.VITE_GEMINI_API_KEY ? 'Present' : 'Missing'
+    });
+
+    // More specific error messages based on the error type
+    if (!import.meta.env.VITE_GEMINI_API_KEY) {
+      return "Sorry, I'm not properly configured right now. Please check the API key configuration. 🔑";
+    }
+
+    if (error instanceof Error) {
+      if (error.message.includes('API key')) {
+        return "There seems to be an issue with my API key. Please try again later. 🔑";
+      }
+      if (error.message.includes('network')) {
+        return "I'm having trouble connecting to my brain right now. Please check your internet connection and try again. 🌐";
+      }
+    }
+
+    return "I apologize, but I'm having trouble processing your request right now. Please try again in a moment. 🙏";
   }
 }
 
 // Function to format response based on language
-export function formatResponse(text: string, _language: string): string {
-  return text;
+export function formatResponse(text: string, language: string): string {
+  try {
+    // Add emoji indicators based on content type
+    const addEmojis = (text: string) => {
+      const patterns = {
+        education: ['education', 'study', 'degree', 'university', 'college'],
+        experience: ['experience', 'work', 'job', 'intern', 'internship'],
+        skills: ['skills', 'technologies', 'programming', 'development'],
+        contact: ['contact', 'email', 'phone', 'linkedin'],
+        projects: ['projects', 'portfolio', 'built', 'created']
+      };
+
+      let modifiedText = text;
+
+      if (patterns.education.some(word => text.toLowerCase().includes(word))) {
+        modifiedText = '🎓 ' + modifiedText;
+      }
+      if (patterns.experience.some(word => text.toLowerCase().includes(word))) {
+        modifiedText = '💼 ' + modifiedText;
+      }
+      if (patterns.skills.some(word => text.toLowerCase().includes(word))) {
+        modifiedText = '🛠️ ' + modifiedText;
+      }
+      if (patterns.contact.some(word => text.toLowerCase().includes(word))) {
+        modifiedText = '📫 ' + modifiedText;
+      }
+      if (patterns.projects.some(word => text.toLowerCase().includes(word))) {
+        modifiedText = '🚀 ' + modifiedText;
+      }
+
+      return modifiedText;
+    };
+
+    // Format the response based on language
+    let formattedText = text;
+    
+    // Add emojis if appropriate
+    formattedText = addEmojis(formattedText);
+
+    // Ensure proper spacing after bullet points
+    formattedText = formattedText.replace(/•(?!\s)/g, '• ');
+
+    return formattedText;
+  } catch (error) {
+    console.error('Response formatting error:', error);
+    return text; // Return original text if formatting fails
+  }
 }
