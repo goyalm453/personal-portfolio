@@ -78,7 +78,7 @@ export async function getGeminiResponse(
   _language: string
 ): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     // Quick response for greetings
     if (/^(hi|hello|hey|namaste|नमस्ते|हाय|हैलो)/i.test(prompt)) {
