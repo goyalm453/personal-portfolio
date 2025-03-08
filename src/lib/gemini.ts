@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Google Generative AI with your API key
-const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 // Resume data context
 const RESUME_CONTEXT = `
