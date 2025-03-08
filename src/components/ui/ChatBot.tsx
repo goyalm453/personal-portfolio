@@ -113,7 +113,6 @@ const TypedMessage: React.FC<{ message: Message }> = React.memo(({ message }) =>
 });
 
 const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
-  // Use ref to persist messages across renders
   const messagesRef = useRef<Message[]>([WELCOME_MESSAGE]);
   const [messages, setMessages] = useState<Message[]>(messagesRef.current);
   const [input, setInput] = useState('');
@@ -128,6 +127,31 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  // Manage body scroll
+  useEffect(() => {
+    if (isOpen) {
+      const scrollPosition = window.pageYOffset;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = `-${scrollPosition}px`;
+    } else {
+      const scrollPosition = document.body.style.top;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+      window.scrollTo(0, parseInt(scrollPosition || '0') * -1);
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+    };
+  }, [isOpen]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
