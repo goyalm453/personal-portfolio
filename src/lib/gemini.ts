@@ -1,7 +1,15 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+// Get API key from environment variables
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+// Validate API key
+if (!API_KEY) {
+  throw new Error('VITE_GEMINI_API_KEY is not defined in environment variables');
+}
+
 // Initialize Google Generative AI with your API key
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 // Resume data context
 const RESUME_CONTEXT = `
@@ -78,6 +86,11 @@ export async function getGeminiResponse(
   _language: string
 ): Promise<string> {
   try {
+    // Validate API key before making request
+    if (!API_KEY) {
+      throw new Error('Gemini API key is not configured');
+    }
+
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
     // Quick response for greetings
@@ -98,9 +111,17 @@ export async function getGeminiResponse(
       'Format: Use **bold**, bullet points, relevant emojis. Be brief.'
     ]);
 
-    return result.response.text();
+    const response = result.response.text();
+    if (!response) {
+      throw new Error('Empty response from Gemini API');
+    }
+
+    return response;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in getGeminiResponse:', error);
+    if (error instanceof Error && error.message.includes('API key')) {
+      return "⚠️ API key configuration error. Please check your environment variables.";
+    }
     return "I'm having trouble right now. Please try again. 🙏";
   }
 }
